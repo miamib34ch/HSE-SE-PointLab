@@ -44,77 +44,91 @@ namespace FormsApp
 
         private void btnSerialize_Click(object sender, EventArgs e)
         {
-            var dlg = new SaveFileDialog();
-
-            dlg.Filter = "SOAP|*.soap|XML|*.xml|JSON|*.json|Binary|*.bin";
-
-            if (dlg.ShowDialog() != DialogResult.OK)
-                return;
-
-            using (var fs =
-            new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write))
+            try
             {
-                switch (Path.GetExtension(dlg.FileName))
+                var dlg = new SaveFileDialog();
+
+                dlg.Filter = "SOAP|*.soap|XML|*.xml|JSON|*.json|Binary|*.bin";
+
+                if (dlg.ShowDialog() != DialogResult.OK)
+                    return;
+
+                using (var fs =
+                new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write))
                 {
-                    case ".bin":
-                        var bf = new BinaryFormatter();
-                        bf.Serialize(fs, points);
-                        break;
-                    case ".xml":
-                        var xf = new XmlSerializer(typeof(Point[]), new[] { typeof(Point3D) });
-                        xf.Serialize(fs, points);
-                        break;
-                    case ".json":
-                        var jf = new JsonSerializer();
-                        jf.TypeNameHandling = TypeNameHandling.All;
-                        using (var w = new StreamWriter(fs))
-                            jf.Serialize(w, points);
-                        break;
-                    case ".soap":
-                        var sf = new SoapFormatter();
-                        sf.Serialize(fs, points);
-                        break;
+                    switch (Path.GetExtension(dlg.FileName))
+                    {
+                        case ".bin":
+                            var bf = new BinaryFormatter();
+                            bf.Serialize(fs, points);
+                            break;
+                        case ".xml":
+                            var xf = new XmlSerializer(typeof(Point[]), new[] { typeof(Point3D) });
+                            xf.Serialize(fs, points);
+                            break;
+                        case ".json":
+                            var jf = new JsonSerializer();
+                            jf.TypeNameHandling = TypeNameHandling.All;
+                            using (var w = new StreamWriter(fs))
+                                jf.Serialize(w, points);
+                            break;
+                        case ".soap":
+                            var sf = new SoapFormatter();
+                            sf.Serialize(fs, points);
+                            break;
+                    }
                 }
+            }
+            catch
+            {
+                MessageBox.Show("Нет данных");
             }
         }
 
         private void btnDeserialize_Click(object sender, EventArgs e)
         {
-            var dlg = new OpenFileDialog();
-
-            dlg.Filter = "SOAP|*.soap|XML|*.xml|JSON|*.json|Binary|*.bin";
-
-            if (dlg.ShowDialog() != DialogResult.OK)
-                return;
-
-            using (var fs =
-            new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read))
+            try
             {
-                switch (Path.GetExtension(dlg.FileName))
-                {
-                    case ".bin":
-                        var bf = new BinaryFormatter();
-                        points = (Point[])bf.Deserialize(fs);
-                        break;
-                    case ".xml":
-                        var xf = new XmlSerializer(typeof(Point[]), new[] { typeof(Point3D) });
-                        points = (Point[])xf.Deserialize(fs);
-                        break;
-                    case ".json":
-                        var jf = new JsonSerializer();
-                        jf.TypeNameHandling = TypeNameHandling.All;
-                        using (var r = new StreamReader(fs))
-                            points = (Point[])jf.Deserialize(r, typeof(Point[]));
-                        break;
-                    case ".soap":
-                        var sf = new SoapFormatter();
-                        points = (Point[])sf.Deserialize(fs);
-                        break;
-                }
-            }
+                var dlg = new OpenFileDialog();
 
-            listBox.DataSource = null;
-            listBox.DataSource = points;
+                dlg.Filter = "SOAP|*.soap|XML|*.xml|JSON|*.json|Binary|*.bin";
+
+                if (dlg.ShowDialog() != DialogResult.OK)
+                    return;
+
+                using (var fs =
+                new FileStream(dlg.FileName, FileMode.Open, FileAccess.Read))
+                {
+                    switch (Path.GetExtension(dlg.FileName))
+                    {
+                        case ".bin":
+                            var bf = new BinaryFormatter();
+                            points = (Point[])bf.Deserialize(fs);
+                            break;
+                        case ".xml":
+                            var xf = new XmlSerializer(typeof(Point[]), new[] { typeof(Point3D) });
+                            points = (Point[])xf.Deserialize(fs);
+                            break;
+                        case ".json":
+                            var jf = new JsonSerializer();
+                            jf.TypeNameHandling = TypeNameHandling.All;
+                            using (var r = new StreamReader(fs))
+                                points = (Point[])jf.Deserialize(r, typeof(Point[]));
+                            break;
+                        case ".soap":
+                            var sf = new SoapFormatter();
+                            points = (Point[])sf.Deserialize(fs);
+                            break;
+                    }
+                }
+
+                listBox.DataSource = null;
+                listBox.DataSource = points;
+            }
+            catch
+            {
+                MessageBox.Show("Плохой файл!");
+            }
         }
     }
 }
