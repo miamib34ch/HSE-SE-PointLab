@@ -63,8 +63,10 @@ namespace FormsApp
                             bf.Serialize(fs, points);
                             break;
                         case ".xml":
-                            var xf = new XmlSerializer(typeof(Point[]), new[] { typeof(Point3D) });
-                            xf.Serialize(fs, points);
+                            XmlRootAttribute rt = new XmlRootAttribute("Points");
+                            XmlAttributeOverrides overrides = new XmlAttributeOverrides();
+                            var xf = new XmlSerializer(typeof(Point[]), overrides, new[] { typeof(Point3D) }, rt, "Points");
+                            xf.Serialize(fs,points);
                             break;
                         case ".json":
                             var jf = new JsonSerializer();
@@ -106,7 +108,9 @@ namespace FormsApp
                             points = (Point[])bf.Deserialize(fs);
                             break;
                         case ".xml":
-                            var xf = new XmlSerializer(typeof(Point[]), new[] { typeof(Point3D) });
+                            XmlRootAttribute rt = new XmlRootAttribute("Points");
+                            XmlAttributeOverrides overrides = new XmlAttributeOverrides();
+                            var xf = new XmlSerializer(typeof(Point[]), overrides, new[] { typeof(Point3D) }, rt, "Points");
                             points = (Point[])xf.Deserialize(fs);
                             break;
                         case ".json":
